@@ -1,0 +1,383 @@
+openapi: 3.0.1
+info:
+  title: Transactions
+  description: APIs to VMX Server
+  termsOfService: https://developer.fiserv.com/support/docs/?path=docs/terms-of-use.md&branch=main
+  contact:
+    name: "Fiserv Solutions, LLC"
+    url: https://www.fiserv.com/
+    email: support@fiserv.com
+  license:
+    name: Apache License Version 2.0
+    url: https://www.apache.org/licences/LICENSE-2.0
+  version: "1.0"
+servers:
+- url: http://localhost:8080/mx/transactions
+  description: Generated server url
+tags:
+- name: Transaction
+  description: Transaction
+paths:
+  /v1/udiRate:
+    put:
+      tags:
+      - Transaction
+      summary: UDI Rate Update
+      description: |-
+        Updates or adds the UDI (Unidad de Inversión) value for a specific date.
+
+        Note: This API is available only in Mexico.
+
+        VMX Service: CMS.UDIRATE.UPD, L8V1
+      operationId: UDI-Rate-Update
+      parameters:
+      - name: apikey
+        in: header
+        description: Application programming interface key.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: X-ClientID
+        in: header
+        description: Client Identification
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maxLength: 5
+          minLength: 5
+          type: string
+          example: "00970"
+      requestBody:
+        description: UDI rate request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UDIRateRequest'
+            examples:
+              Example 1:
+                value:
+                  udiDate: 2028-01-03
+                  udiRate: 3.345679
+        required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UDIRateResponse'
+              examples:
+                Example 1:
+                  value:
+                    inflationRate: 1.0E-6
+        "300":
+          description: Redirection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "405":
+          description: Method Not Allowed
+        "422":
+          description: "VPL5SUA01S - APPLICATION IN NO-PROCESSING STATUS, RETRY IN\
+            \ A FEW MINUTES\n\nVPL5SUA02S - UDI DATE NOT ENTERED                 \
+            \                           \n\nVPL5SUA03S - INVALID UDI DATE        \
+            \                                        \n\nVPL5SUA04S - UDI RATE NOT\
+            \ ENTERED                                            \n\nVPL5SUA05S -\
+            \ ENTER VALID NUMERIC UDI RATE                                    \n\n\
+            VPL5SUA06S - UDI RATE MUST BE GREATER THAN ZERO                      \
+            \        \n\nVPL5SUA07S - UDI RECORD NOT PRESENT                     \
+            \                     \n\nVPL5SUA08S - UDI DATE IS NOT FUTURE DATE, NOT\
+            \ MATCHING WITH ANY EXISTING DATE\n\nVPL5SUA09S - GETMAIN FAILURE    \
+            \                                             \n\nVPL5SUA10S - SERVICE\
+            \ INPUT FOR SERVICE IS AN INCORRECT LENGTH                \n\nVPL5SUA13S\
+            \ - DATE MUST BE > LATEST ENTRY AND MUST BE < 30 DAYS FROM TODAY\n"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "500":
+          description: Backend Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      servers:
+      - url: http://localhost:8080/mx/transactions
+        description: Generated server url
+      x-internal: true
+      x-proxy-name: UDI Rate Update
+      x-group-name: Transactions
+  /v1/catCalculation:
+    post:
+      tags:
+      - Transaction
+      summary: Cat Calculation
+      description: "The CAT calculation service calculates annual total cost of the\
+        \ credit in real time.\r\nVMX Service: M.CMS.CALCULATE.CAT.ADD, L8V2"
+      operationId: /mx/transactions/v1/catCalculation
+      parameters:
+      - name: apikey
+        in: header
+        description: Application programming interface key.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: X-ClientID
+        in: header
+        description: Client Identification
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maxLength: 5
+          minLength: 5
+          type: string
+          example: "00970"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/catCalculateV1Request'
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/catCalculateV1Response'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 12
+                    firstName: Bob
+                    lastName: Fellow
+                    email: bob.fellow@gmail.com
+                    dateOfBirth: 1996-08-24
+                    emailVerified: false
+                    createDate: 2020-11-18
+        "400":
+          description: Missing Required Information
+        "409":
+          description: Email Already Taken
+        "422":
+          description: "VPL5SAA02S - ORG NUMBER MUST BE NUMERIC AND VALID VALUES ARE\
+            \ 001-998   \r\n\r\nVPL5SAA11S - ORG RECORD NOT FOUND                \
+            \                      \r\n\r\nVPL5SAA04S - LOGO NUMBER MUST BE NUMERIC\
+            \ AND VALID VALUES ARE 001-998  \r\n\r\nVPL5SAA12S - LOGO RECORD NOT FOUND\
+            \                                     \r\n\r\nVPL5SAA18E - CREDIT LIMIT\
+            \ MUST BE NUMERIC                              \r\n\r\nVPLCSCAT1S - ERROR\
+            \ IN CAT CALCULATION                                  \r\n\r\nVPLCSCATAS\
+            \ - CAT CALC FLAG IS INACTIVE AT LOGO LEVEL     "
+      servers:
+      - url: http://localhost:8080/mx/transactions
+        description: Generated server url
+      x-proxy-name: CAT Calculation
+      x-child-product-name: Transactions
+components:
+  schemas:
+    UDIRateRequest:
+      title: UDI Rate Request
+      required:
+      - udiDate
+      - udiRate
+      type: object
+      properties:
+        udiDate:
+          type: string
+          description: |-
+            The effective date (in ISO 8601) for UDI (Unidad de Inversión) Rate.
+
+            VisionPLUS Service Data: AZXUAI-UDI-DATE
+          format: date
+          example: 2023-01-03
+        udiRate:
+          maximum: 9.999999
+          minimum: 0.0000010
+          type: number
+          description: |-
+            - Min Length: 8
+            - Max Length: 8
+            The rate for the UDI (Unidad de Inversión) for a specific date.
+
+            VisionPLUS Service Data: AZXUAI-UDI-RATE
+          format: float
+          example: 3.345679
+      description: UDI Rate Information
+      x-examples:
+        Example 1:
+          udiDate: 2028-01-03
+          udiRate: 3.345679000000000069547922976198606193065643310546875
+    UDIRateResponse:
+      title: UDI Rate Response
+      required:
+      - inflationRate
+      type: object
+      properties:
+        inflationRate:
+          maximum: 9.999999
+          minimum: 0.0000010
+          type: number
+          description: |-
+            Length: 8
+
+            Inflation rate is the ratio calculated between the current UDI (Unidad de Inversión) date and the previous UDI date.
+
+            VisionPLUS Service Data: AZXUAO-INF-RATE
+          format: float
+          example: 0.0000010
+      description: UDI Rate Information
+      x-examples:
+        Example 1:
+          inflationRate: 0.000000999999999999999954748111825886258685613938723690807819366455078125
+    ErrorResponse:
+      type: object
+      properties:
+        hasError:
+          type: boolean
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+        data:
+          type: object
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+    catCalculateV1Request:
+      title: CAT Calculate Request
+      required:
+      - creditLimit
+      - logo
+      - organizationNumber
+      type: object
+      properties:
+        organizationNumber:
+          maximum: 998
+          minimum: 1
+          type: integer
+          description: "* Min Length: 3\r\n* Max Length: 3\r\n\r\nThe organizationNumber\
+            \ field is an attribute that holds the unique identification number assigned\
+            \ to an organization within the API.\r\n\r\nVisionPLUS:\r\n- Service Data:\
+            \ AZXECI-ORG\r\n- Screen, Page & Field: ARMF00 - ORG"
+          example: 738
+        logo:
+          maximum: 998
+          minimum: 1
+          type: integer
+          description: "* Min Length: 3\r\n* Max Length: 3\r\n\r\nThe logo field stores\
+            \ the issuer logo code associated with a payment card. It represents the\
+            \ unique identifier or code assigned to the logo of the card issuer, allowing\
+            \ for accurate identification and association with the issuing bank.\r\
+            \n\r\nValid Values: 001-999\r\n\r\nVisionPLUS:\r\n- Service Data: AZXECI-LOGO\
+            \ \r\n- Screen, Page & Field: ARMF00 - LOGO"
+          example: 400
+        creditLimit:
+          maximum: 100000000000000000
+          minimum: 0
+          type: number
+          description: "- Min Length: 1\r\n- Max Length: 17\r\n\r\nThe creditLimit\
+            \ field indicates the maximum allowed credit for an account. It sets the\
+            \ upper limit for borrowing or charging to the account.\r\n\r\nVisionPLUS:\r\
+            \n- Service Data: AZXECI-CRLIM\r\n- Screen, Page & Field: ARIQ01 - TOT\
+            \ CR LMT "
+          example: 25625.97
+        processingControlId:
+          maxLength: 3
+          type: string
+          description: "The processingControlId field represents the code that identifies\
+            \ the Processing Control Table\r\n\r\nValid Values: any alpha or numeric\
+            \ combination (AAA- ZZZ, 001-999)\r\n\r\nVisionPLUS:\r\n- Service Data:\
+            \ AZXECI-PCT \r\n- Screen, Page & Field: ARMF00 - PCT ID | ARQB03: BANKARD\
+            \ ID (RESIDENCE ID for Private Label Products) "
+          example: A67
+    catCalculateV1Response:
+      title: catCalculateV1Response
+      type: object
+      properties:
+        rate:
+          $ref: '#/components/schemas/catCalculateV1Response_rate'
+        fee:
+          $ref: '#/components/schemas/catCalculateV1Response_fee'
+        totalAnnualCostValue:
+          maximum: 9999999
+          minimum: 0
+          type: integer
+          description: "- Max length: 7\r\n\r\nThe totalAnnualCostValue field indicates\
+            \ the CAT (total annual cost to the credit limit) value.\r\n\r\nVisionPLUS:\r\
+            \n- Service Data: AZXECO-CAT-PRODUCT\r\n- Screen & Field: ARIQ03 - CAT\
+            \ - Total Efective Cost "
+          example: 6547
+    catCalculateV1Response_rate:
+      type: object
+      properties:
+        floor:
+          maximum: 9999999
+          minimum: 0
+          type: number
+          description: "- Max length: 7\r\n\r\nThe floor field represents the minimum\
+            \ allowable interest rate for credit plans.\r\n\r\nVisionPLUS:\r\n\r\n\
+            - Service Data: AZXECO-FLOOR-RATE\r\n- Screen, Page & Field: ARMR02 -\
+            \ FLOOR RATE 1\r\n"
+          example: 22748
+        inflation:
+          maximum: 9999999
+          minimum: 0
+          type: number
+          description: "- Max length: 7\r\n\r\nThe inflation field represents the\
+            \ value calculated based on the current UDI (inversion unity) and previous\
+            \ UDI rate.\r\nRate provided by the client central bank on a daily basis.\
+            \ You need to enter all 6 digits after decimal even if there is 0 at the\
+            \ end. If you do not enter 6 digit, then the values will be right justified\
+            \ with zeros added at the beginning of decimal.\r\n\r\nVisionPLUS:\r\n\
+            \r\n- Service Data: AZXECO-VAR-RATE \r\n- Screen, Page & Field: AZ6R01\
+            \ - INF RATE"
+          example: 65
+    catCalculateV1Response_fee:
+      type: object
+      properties:
+        cardReplacementFee:
+          maximum: 9999999999999
+          minimum: 0
+          type: number
+          description: "- Max length: 17\r\n\r\nThe cardReplacementFee field represents\
+            \ the amount in monetary units and subunits to assess for each card issued\
+            \ or reissued up to the number of cards in the LIMIT field, inclusive.\r\
+            \n\r\nVisionPLUS:\r\n\r\n- Service Data: AZXECO-CARD-REPL-FEE\r\n- Screen,\
+            \ Page & Field: ARVM07 - RATE 1"
+          example: 234
+        annuity:
+          maximum: 9999999999999
+          minimum: 0
+          type: number
+          description: "Max length: 13\r\n\r\nSpecify how the initial membership fee\
+            \ is charged.\r\n\r\nVisionPLUS:\r\n- Service Data: AZXECO-ANNUITY\r\n\
+            - - Screen, Page & Field: ARVM06- INITIAL MEMBERSHIP "
+          example: 365
+        collectionExpenses:
+          maximum: 9999999999999
+          minimum: 0
+          type: number
+          description: "- Max length: 17\r\n\r\nThe collectionExpenses field is a\
+            \ two-part field that indicates the late fee amount, in monetary units\
+            \ and subunits, and the percentage of the late payment assessed as a late\
+            \ fee.\r\n\r\nVisionPLUS:\r\n\r\n- Service Data: AZXECO-COLC-EXPENSE\r\
+            \n- Screen, Page & Field:: ARVM03 - LATE FEE AMOUNT AND PERCENT 1"
+          example: 5542
